@@ -75,6 +75,8 @@ public class StandardEnvironment extends AbstractEnvironment {
 	 */
 	@Override
 	protected void customizePropertySources(MutablePropertySources propertySources) {
+		// 这里就设置了两个属性值："systemEnvironment"  "systemProperties"
+		// 在SpringBoot-web中 有像 "servletContextInitParams" "servletConfigInitParams"  便是配置web.xml中的<init-params>的属性值
 		propertySources.addLast(
 				new PropertiesPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, getSystemProperties()));
 		propertySources.addLast(

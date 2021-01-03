@@ -192,7 +192,12 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private boolean enforceDestroyMethod = true;
 
 	private boolean synthetic = false;
-
+	/**
+	 * 定义这个bean的角色：
+	 * 		application:用户；
+	 * 		infrastructure: 完全内部使用，与用户无关；
+	 * 		support: 某些复杂配置的一部分。
+	 */
 	private int role = BeanDefinition.ROLE_APPLICATION;
 
 	@Nullable
@@ -436,10 +441,12 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	@Nullable
 	public Class<?> resolveBeanClass(@Nullable ClassLoader classLoader) throws ClassNotFoundException {
+		// 获取className
 		String className = getBeanClassName();
 		if (className == null) {
 			return null;
 		}
+		// 获取当前bean对应的Class对象
 		Class<?> resolvedClass = ClassUtils.forName(className, classLoader);
 		this.beanClass = resolvedClass;
 		return resolvedClass;
@@ -1095,7 +1102,16 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @param mo the MethodOverride object to validate
 	 * @throws BeanDefinitionValidationException in case of validation failure
 	 */
+	//Spring中存在lookup-method(替换某个方法的返回哪个bean), 和replace-method(替换某个方法为自己的逻辑(需实现MethodReplacer 接口))两个配置功能，
+	//这两个配置的加载其实就是将配置统一存放在BeanDefinition中的methodOverrides属性中。
+	//这两个功能实现原理：在bean实例化的时候，如果检测到存在methodOverrides属性，会动态为当前bean生成代理，并使用对应的拦截器为bean做增强
+	// 这里要提到的是，对于方法的匹配(多个重载的方法，有相同的方法名，具体要替换哪一个方法呢？)来讲，
+	// 在函数调用及增强的时候还需要要根据参数类型匹配。来最终确认当前调用的到底是哪个函数。
+	// 但是Spring将一部分匹配工作在这里完成了：
+	// 		如果当前类中的方法只有一个，就设置此方法没有被重载，这样在后续调用的时候，便可以直接使用找到的方法，而不需要进行方法的参数匹配验证了，
+	// 		而且还能提前对方法存在性进行验证。
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
+		// 获取对应类中对应方法名的个数
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
 		if (count == 0) {
 			throw new BeanDefinitionValidationException(
@@ -1104,6 +1120,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		}
 		else if (count == 1) {
 			// Mark override as not overloaded, to avoid the overhead of arg type checking.
+			// 标记MethodOverride暂未被覆盖，避免参数类型检查的开销
 			mo.setOverloaded(false);
 		}
 	}

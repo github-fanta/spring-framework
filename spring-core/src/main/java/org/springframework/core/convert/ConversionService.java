@@ -72,6 +72,7 @@ public interface ConversionService {
 	 * @throws ConversionException if a conversion exception occurred
 	 * @throws IllegalArgumentException if targetType is {@code null}
 	 */
+	// 类型转换，获取合适的转换器进行类型的转换，默认是DefaultConversionService,也可以是自定义的
 	@Nullable
 	<T> T convert(@Nullable Object source, Class<T> targetType);
 

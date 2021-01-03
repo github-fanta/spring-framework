@@ -75,6 +75,7 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 	}
 
 	@Nullable
+	// key : "username"
 	protected <T> T getProperty(String key, Class<T> targetValueType, boolean resolveNestedPlaceholders) {
 		if (this.propertySources != null) {
 			for (PropertySource<?> propertySource : this.propertySources) {
@@ -88,6 +89,7 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 						value = resolveNestedPlaceholders((String) value);
 					}
 					logKeyFound(key, propertySource, value);
+					// 找到 如"username" 的环境变量值了，就替换
 					return convertValueIfNecessary(value, targetValueType);
 				}
 			}

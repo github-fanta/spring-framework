@@ -54,12 +54,14 @@ import org.springframework.util.StringUtils;
 public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationStrategy {
 
 	/**
+	 * 如果没有override方法覆盖的话，那么索引位置为0
 	 * Index in the CGLIB callback array for passthrough behavior,
 	 * in which case the subclass won't override the original class.
 	 */
 	private static final int PASSTHROUGH = 0;
 
 	/**
+	 * 如果有lookup-method的覆盖，那么索引位置为1
 	 * Index in the CGLIB callback array for a method that should
 	 * be overridden to provide <em>method lookup</em>.
 	 */
@@ -77,11 +79,13 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		return instantiateWithMethodInjection(bd, beanName, owner, null);
 	}
 
+	// 子类重写SimpleInstantiationStrategy中的instantiateWithMethodInjection方法
 	@Override
 	protected Object instantiateWithMethodInjection(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner,
 			@Nullable Constructor<?> ctor, Object... args) {
 
 		// Must generate CGLIB subclass...
+		// 必须生成一个cglib的子类
 		return new CglibSubclassCreator(bd, owner).instantiate(ctor, args);
 	}
 
@@ -91,20 +95,21 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 	 * in Spring versions earlier than 3.2.
 	 */
 	private static class CglibSubclassCreator {
-
+		// 此处定义了一个回调类型的数组，后面MethodOverrideCallbackFilter通过指定下标获取对应的拦截
 		private static final Class<?>[] CALLBACK_TYPES = new Class<?>[]
 				{NoOp.class, LookupOverrideMethodInterceptor.class, ReplaceOverrideMethodInterceptor.class};
 
 		private final RootBeanDefinition beanDefinition;
 
 		private final BeanFactory owner;
-
+		// 构造方法
 		CglibSubclassCreator(RootBeanDefinition beanDefinition, BeanFactory owner) {
 			this.beanDefinition = beanDefinition;
 			this.owner = owner;
 		}
 
 		/**
+		 * 实例化入口： 动态构造子类
 		 * Create a new instance of a dynamically generated subclass implementing the
 		 * required lookups.
 		 * @param ctor constructor to use. If this is {@code null}, use the
@@ -114,14 +119,18 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		 * @return new instance of the dynamically generated subclass
 		 */
 		public Object instantiate(@Nullable Constructor<?> ctor, Object... args) {
+			// 根据beanDefinition来创建一个cglib的子类
 			Class<?> subclass = createEnhancedSubclass(this.beanDefinition);
 			Object instance;
+			// 如果构造器等于空，那么直接通过反射来实例化对象
 			if (ctor == null) {
 				instance = BeanUtils.instantiateClass(subclass);
 			}
 			else {
 				try {
+					// 通过cglib对象来根据参数类型获取对应的构造器
 					Constructor<?> enhancedSubclassConstructor = subclass.getConstructor(ctor.getParameterTypes());
+					// 通过构造器来获取对象
 					instance = enhancedSubclassConstructor.newInstance(args);
 				}
 				catch (Exception ex) {
@@ -142,8 +151,11 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		 * Create an enhanced subclass of the bean class for the provided bean
 		 * definition, using CGLIB.
 		 */
+		// 使用CGLIB进行Bean对象实例化
 		private Class<?> createEnhancedSubclass(RootBeanDefinition beanDefinition) {
+			// CGLIB中的类
 			Enhancer enhancer = new Enhancer();
+			// 将Bean本身作为其基类
 			enhancer.setSuperclass(beanDefinition.getBeanClass());
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
 			if (this.owner instanceof ConfigurableBeanFactory) {

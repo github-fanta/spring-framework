@@ -45,6 +45,8 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
 
+	// 设置XML文件的验证标志，默认是true
+	// 验证xml文件dtd xsd规范的，运行起来再报错就不合适了。
 	private boolean validating = true;
 
 
@@ -80,17 +82,25 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
+		// 适配器模式  XmlBeanDefinitionReader：专门用来解析xml文件
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
 		// Configure the bean definition reader with this context's
 		// resource loading environment.
+		// 把环境对象设置进去 数据库配置${username}或者报错后用的${jdbc.username} 这些属性都是从这里拿到的
 		beanDefinitionReader.setEnvironment(this.getEnvironment());
+		// 设置资源加载器
 		beanDefinitionReader.setResourceLoader(this);
+		// 设置一个实现了EntityResolver接口的实例，用它来读取本地的一些xsd/dtd格式文件，来完成相关的一些解析工作。
+		// 这里的Entity 就是指的是 xml标签
+		// 本来xml文档的schema是要联网的(http://www.balabale...xsd) ，现在我读取本地的就可以  这里只是设置，还没有真正解析
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
 		// Allow a subclass to provide custom initialization of the reader,
 		// then proceed with actually loading the bean definitions.
+		// 初始化beanDefinitionReader对象，此处就只是给适配的reader设置了配置文件是否要进行验证
 		initBeanDefinitionReader(beanDefinitionReader);
+		// 开始完成beanDefinition的加载  重载的方法  整个过程会有好多这个重载方法
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
@@ -119,12 +129,16 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
+		// 以Resource的方式获得配置文件的资源位置  getConfigResources其实很少用
 		Resource[] configResources = getConfigResources();
 		if (configResources != null) {
 			reader.loadBeanDefinitions(configResources);
 		}
+		// 以String的形式获得配置文件的位置 这个之前已经设置过了，所以这里直接get
+		// {@link #org.springframework.context.support.AbstractRefreshableConfigApplicationContext.setConfigLocations}
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
+			// 又是一个重载方法，参数是路径数组
 			reader.loadBeanDefinitions(configLocations);
 		}
 	}

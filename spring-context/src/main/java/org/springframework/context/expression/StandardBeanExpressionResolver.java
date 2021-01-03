@@ -50,9 +50,11 @@ import org.springframework.util.StringUtils;
 public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 
 	/** Default expression prefix: "#{". */
+	// 默认表达式前缀
 	public static final String DEFAULT_EXPRESSION_PREFIX = "#{";
 
 	/** Default expression suffix: "}". */
+	// 默认表达式后缀
 	public static final String DEFAULT_EXPRESSION_SUFFIX = "}";
 
 
@@ -94,6 +96,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 	 * using it as the basis for expression compilation.
 	 * @param beanClassLoader the factory's bean class loader
 	 */
+	// 处理器 里有个 解析器 里有个 配置类
 	public StandardBeanExpressionResolver(@Nullable ClassLoader beanClassLoader) {
 		this.expressionParser = new SpelExpressionParser(new SpelParserConfiguration(null, beanClassLoader));
 	}

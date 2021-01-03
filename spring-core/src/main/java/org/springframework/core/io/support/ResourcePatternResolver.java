@@ -71,6 +71,7 @@ public interface ResourcePatternResolver extends ResourceLoader {
 	 * @return the corresponding Resource objects
 	 * @throws IOException in case of I/O errors
 	 */
+	// 1.to AbstractAC  第二次： PathMatchingR...
 	Resource[] getResources(String locationPattern) throws IOException;
 
 }

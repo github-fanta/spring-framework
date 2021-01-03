@@ -78,6 +78,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 			Assert.noNullElements(locations, "Config locations must not be null");
 			this.configLocations = new String[locations.length];
 			for (int i = 0; i < locations.length; i++) {
+				// 咋还要解析路径干啥呢？ 如果传进来的 xml配置文件是这样的  要从环境变量找值替换上去 spring-${username}.xml
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
 		}
@@ -98,6 +99,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 */
 	@Nullable
 	protected String[] getConfigLocations() {
+		// configLocations之前设置过，所以这里可以直接调用了
 		return (this.configLocations != null ? this.configLocations : getDefaultConfigLocations());
 	}
 

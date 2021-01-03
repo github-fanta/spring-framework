@@ -134,10 +134,12 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @throws BeansException if context creation failed
 	 * @see #refresh()
 	 */
+	// this(new String[] {configLocation}, true, null);
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
-
+		// 调用父类构造方法，创建相关对象等操作
+		// 如果后面用到一些成员属性的时候，如果不知道在哪里初始化的，要想起这里
 		super(parent);
 		setConfigLocations(configLocations);
 		if (refresh) {
@@ -206,6 +208,8 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	@Override
 	@Nullable
 	protected Resource[] getConfigResources() {
+		// 这个属性只有调用上面一个工厂的构造方法的时候才会设置进来，而我们一般构造方法只写 xml文件位置，不会传后面两个参数
+		// 所以这个方法很少用
 		return this.configResources;
 	}
 

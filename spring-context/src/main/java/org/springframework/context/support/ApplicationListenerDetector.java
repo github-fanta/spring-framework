@@ -30,6 +30,9 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 此类用来检测bean是否实现了ApplicaitonListener接口，两个作用：
+ * 1.实例化完成后，如果bean的单例的并且属于ApplicationListener接口，则加入到多播器中
+ * 2.bean销毁之前，如果bean是一个ApplicationListener，则从多播器中提前删除
  * {@code BeanPostProcessor} that detects beans which implement the {@code ApplicationListener}
  * interface. This catches beans that can't reliably be detected by {@code getBeanNamesForType}
  * and related operations which only work against top-level beans.
@@ -70,19 +73,24 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		if (bean instanceof ApplicationListener) {
 			// potentially not detected as a listener by getBeanNamesForType retrieval
+			// 通过getBeanNamesForType 有可能没有检索到监听器
 			Boolean flag = this.singletonNames.get(beanName);
 			if (Boolean.TRUE.equals(flag)) {
 				// singleton bean (top-level or inner): register on the fly
+				// 赶忙注册到容器
 				this.applicationContext.addApplicationListener((ApplicationListener<?>) bean);
 			}
 			else if (Boolean.FALSE.equals(flag)) {
 				if (logger.isWarnEnabled() && !this.applicationContext.containsBean(beanName)) {
 					// inner bean with other scope - can't reliably process events
+					// 多播器通过容器拿不到实现了ApplicationListener接口的bean，因为其没有单例的作用域
+					// 仅仅顶层的(而非内部类)监听器类可以被允许是非单例的
 					logger.warn("Inner bean '" + beanName + "' implements ApplicationListener interface " +
 							"but is not reachable for event multicasting by its containing ApplicationContext " +
 							"because it does not have singleton scope. Only top-level listener beans are allowed " +
 							"to be of non-singleton scope.");
 				}
+				// 把这个奇怪的应用监听器移除掉
 				this.singletonNames.remove(beanName);
 			}
 		}

@@ -64,9 +64,11 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
+	// 允许覆盖同名称的不同定义的对象
 	@Nullable
 	private Boolean allowBeanDefinitionOverriding;
 
+	// 允许bean之间的循环依赖
 	@Nullable
 	private Boolean allowCircularReferences;
 
@@ -119,14 +121,22 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
+		// 如果存在Bean工厂 则销毁BeanFactory
+		// 之前为啥还会有bean工厂？ 为啥叫刷新？  Spring是个底子，给上层的Spring Cloud,  SpringMvc 等使用的 要考虑各种情况，以后再讲
+		// 如果不理解刷新，就将其理解成 创建一个bean工厂
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
 		}
 		try {
+			// 创建DefaultListableBeanFactory对象
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			// 为了序列化指定id,可以从id反序列化到beanFactory对象
+			// id: AbstractApplicationContext的id值，用来标识唯一的上下文
 			beanFactory.setSerializationId(getId());
+			// 定制beanFactory,设置相关属性，包括是否允许覆盖同名称的不同定义的对象以及循环依赖
 			customizeBeanFactory(beanFactory);
+			// 初始化documentReader,并进行XML文件读取及解析  过程中会涉及多个同名的重载方法
 			loadBeanDefinitions(beanFactory);
 			this.beanFactory = beanFactory;
 		}
@@ -211,10 +221,21 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
 	 * @see DefaultListableBeanFactory#setAllowEagerClassLoading
 	 */
+	// 此方法用来实现Bean工厂的属性设置，主要是设置两个属性
+	// allowBeanDefinitionOverriding   指代的就是<bean>标签里面的<lookup-method></lookup-method> 和 <replaced-method></replaced-method>
+	// 用来修改bean定义的
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+		// 还可以更改这两个属性的配置：
+		// 重写这个方法  然后：
+		// beanFactory(或super).setAllowBeanDefinitionOverriding(false);
+		// beanFactory.setAllowCircularReferences(false);
+		// super.customizeBeanFactory(beanFactory);
+
+		// 如果属性allowBeanDefinitionOverriding不为空， 设置给beanFactory对象相应属性，是否允许覆盖同名称的不同定义的对象
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
+		// 如果属性allowCircularReferences不为空，设置beanFactory对象相应属性，是否允许bean之间存在循环引用
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}

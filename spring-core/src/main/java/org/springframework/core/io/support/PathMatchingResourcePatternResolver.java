@@ -203,6 +203,10 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 
 	private final ResourceLoader resourceLoader;
 
+	// 创建ant方式的路径匹配器 ant除了是一个构建工具外，ant还是一种路径表达式的风格
+	// 如/app/*.x 匹配所有在app路径下的.x文件
+	// /app/p?ttern  匹配/app/pattern和/app/pXttern 单不包含 /app/pttern
+	// 原来strus还用的多一点，现在几乎不用了。
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
 
@@ -274,9 +278,11 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		return getResourceLoader().getResource(location);
 	}
 
+	// locationPattern = "spring-config.xml"
 	@Override
 	public Resource[] getResources(String locationPattern) throws IOException {
 		Assert.notNull(locationPattern, "Location pattern must not be null");
+		// 是否以classpath开头
 		if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
 			// a class path resource (multiple resources for same name possible)
 			if (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
@@ -291,13 +297,17 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		else {
 			// Generally only look for a pattern after a prefix here,
 			// and on Tomcat only after the "*/" separator for its "war:" protocol.
+			// spring-config.xml 并不包含 "war:" "*/" 啥的
 			int prefixEnd = (locationPattern.startsWith("war:") ? locationPattern.indexOf("*/") + 1 :
 					locationPattern.indexOf(':') + 1);
+			// 所以这不不匹配 跳过
 			if (getPathMatcher().isPattern(locationPattern.substring(prefixEnd))) {
 				// a file pattern
 				return findPathMatchingResources(locationPattern);
 			}
 			else {
+				// 走到这里
+				// 最终把这个路径值变成Resource的一个对象(数组哦)   这个单一路径可能产生多个对象
 				// a single resource with the given name
 				return new Resource[] {getResourceLoader().getResource(locationPattern)};
 			}

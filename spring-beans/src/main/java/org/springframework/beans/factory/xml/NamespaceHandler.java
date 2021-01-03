@@ -69,6 +69,7 @@ public interface NamespaceHandler {
 	 * @param parserContext the object encapsulating the current state of the parsing process
 	 * @return the primary {@code BeanDefinition} (can be {@code null} as explained above)
 	 */
+	// NamespacehandlerSupport
 	@Nullable
 	BeanDefinition parse(Element element, ParserContext parserContext);
 

@@ -86,6 +86,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		this.registry = registry;
 
 		// Determine ResourceLoader to use.
+		// 如果你是个ResourceLoader类型，就把它设置成resourceLoader
 		if (this.registry instanceof ResourceLoader) {
 			this.resourceLoader = (ResourceLoader) this.registry;
 		}
@@ -94,6 +95,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		}
 
 		// Inherit Environment if possible
+		// 如果你是个EnvironmentCapable 类型  就把它设置成environment
 		if (this.registry instanceof EnvironmentCapable) {
 			this.environment = ((EnvironmentCapable) this.registry).getEnvironment();
 		}
@@ -109,6 +111,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
 	@Override
 	public final BeanDefinitionRegistry getRegistry() {
+		// 调试时 就是DefaultListableBeanFactory
+		// registry 包含了一些增删改的一些操作
 		return this.registry;
 	}
 
@@ -191,7 +195,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 	@Override
-	public int loadBeanDefinitions(String location) throws BeanDefinitionStoreException {
+	public int  loadBeanDefinitions(String location) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(location, null);
 	}
 
@@ -211,15 +215,18 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
+		// 此处获取resourceLoader对象  就是当前类的一个对象(ClassPathXmlApplicationContext  因为ApplicationContext也实现了ResourceLoader)不用管它
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
 					"Cannot load bean definitions from location [" + location + "]: no ResourceLoader available");
 		}
 
+		// 可以搜下ClassPathXmlApplicationContext 看它的类图继承关系
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			// Resource pattern matching available.
 			try {
+				// 调用DefaultResourceLoader的getResource完成具体的Resource定位
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
 				int count = loadBeanDefinitions(resources);
 				if (actualResources != null) {
@@ -254,6 +261,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		Assert.notNull(locations, "Location array must not be null");
 		int count = 0;
 		for (String location : locations) {
+			// 又是一个重载方法 参数 单一路径String
 			count += loadBeanDefinitions(location);
 		}
 		return count;

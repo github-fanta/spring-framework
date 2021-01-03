@@ -139,6 +139,8 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 	 * Activate the default editors for this registry instance,
 	 * allowing for lazily registering default editors when needed.
 	 */
+	// 这里并没有做什么属性编辑器的注册工作，而是把标志位置为true
+	// 因为是懒加载，什么时候做处理的时候，再加载即可
 	protected void registerDefaultEditors() {
 		this.defaultEditorsActive = true;
 	}

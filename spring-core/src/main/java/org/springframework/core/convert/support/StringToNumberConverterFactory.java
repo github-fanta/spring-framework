@@ -47,6 +47,7 @@ final class StringToNumberConverterFactory implements ConverterFactory<String, N
 	}
 
 
+	// 要把String转成 Number的某个子类
 	private static final class StringToNumber<T extends Number> implements Converter<String, T> {
 
 		private final Class<T> targetType;

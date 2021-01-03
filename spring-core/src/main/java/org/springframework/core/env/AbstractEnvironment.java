@@ -121,6 +121,8 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * @see #customizePropertySources(MutablePropertySources)
 	 */
 	public AbstractEnvironment() {
+		// 定制化属性资源
+		// 就是初始化设置一些 如spring.getenv.ignore，spring.profiles.active，spring.profiles.default，default等属性的值
 		customizePropertySources(this.propertySources);
 	}
 

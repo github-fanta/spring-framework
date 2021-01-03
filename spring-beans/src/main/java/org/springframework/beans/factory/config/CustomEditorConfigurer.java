@@ -140,9 +140,11 @@ public class CustomEditorConfigurer implements BeanFactoryPostProcessor, Ordered
 	}
 
 
+	// 后置处理器执行时
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		if (this.propertyEditorRegistrars != null) {
+			// 把属性注册器加到容器中
 			for (PropertyEditorRegistrar propertyEditorRegistrar : this.propertyEditorRegistrars) {
 				beanFactory.addPropertyEditorRegistrar(propertyEditorRegistrar);
 			}

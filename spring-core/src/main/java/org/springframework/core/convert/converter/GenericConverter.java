@@ -22,6 +22,7 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+// 用于两种或更多种类之间转换的通用(基础类型)转换器接口
 /**
  * Generic converter interface for converting between two or more types.
  *
@@ -53,6 +54,7 @@ public interface GenericConverter {
 	 * <p>For {@link ConditionalConverter conditional converters} this method may return
 	 * {@code null} to indicate all source-to-target pairs should be considered.
 	 */
+	// 返回转换器集合可以转换源和目标类型
 	@Nullable
 	Set<ConvertiblePair> getConvertibleTypes();
 
@@ -63,6 +65,7 @@ public interface GenericConverter {
 	 * @param targetType the type descriptor of the field we are converting to
 	 * @return the converted object
 	 */
+	// 转换源对象到目标类型的描述TypeDescriptor(内部包含很多基础类型)
 	@Nullable
 	Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType);
 

@@ -59,6 +59,7 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	 * @see RootBeanDefinition
 	 * @see ChildBeanDefinition
 	 */
+	// DefaultListableBF
 	void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException;
 
@@ -95,6 +96,7 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	 * Return the number of beans defined in the registry.
 	 * @return the number of beans defined in the registry
 	 */
+	// to DefaultListableBeanF
 	int getBeanDefinitionCount();
 
 	/**

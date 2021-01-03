@@ -25,10 +25,10 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * definition) that the Spring {@code BeanFactory} uses to create a bean instance.
  *
  * <p>The {@link #postProcessMergedBeanDefinition} method may for example introspect
- * the bean definition in order to prepare some cached metadata before post-processing
- * actual instances of a bean. It is also allowed to modify the bean definition but
- * <i>only</i> for definition properties which are actually intended for concurrent
- * modification. Essentially, this only applies to operations defined on the
+ *  * the bean definition in order to prepare some cached metadata before post-processing
+ *  * actual instances of a bean. It is also allowed to modify the bean definition but
+ *  * <i>only</i> for definition properties which are actually intended for concurrent
+ *  * modification. Essentially, this only applies to operations defined on the
  * {@link RootBeanDefinition} itself but not to the properties of its base classes.
  *
  * @author Juergen Hoeller
@@ -38,12 +38,14 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 public interface MergedBeanDefinitionPostProcessor extends BeanPostProcessor {
 
 	/**
+	 * Spring通过此方法找出所有需要注入的字段,同时做缓存
 	 * Post-process the given merged bean definition for the specified bean.
 	 * @param beanDefinition the merged bean definition for the bean
 	 * @param beanType the actual type of the managed bean instance
 	 * @param beanName the name of the bean
 	 * @see AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors
 	 */
+	// Spring通过此方法找出所有需要注入的字段，同时做缓存
 	void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName);
 
 	/**
@@ -54,6 +56,7 @@ public interface MergedBeanDefinitionPostProcessor extends BeanPostProcessor {
 	 * @since 5.1
 	 * @see DefaultListableBeanFactory#resetBeanDefinition
 	 */
+	// 用于在BeanDefinition被修改后，清除容器的缓存
 	default void resetBeanDefinition(String beanName) {
 	}
 

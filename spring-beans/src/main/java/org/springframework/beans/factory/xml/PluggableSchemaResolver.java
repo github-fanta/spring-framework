@@ -85,6 +85,11 @@ public class PluggableSchemaResolver implements EntityResolver {
 	 */
 	public PluggableSchemaResolver(@Nullable ClassLoader classLoader) {
 		this.classLoader = classLoader;
+		// 这里啥都没干  但是指出来一个关键的路径
+		// 在spring-beans 的jar包下  可以看到这个路径下的 "META-INF/spring.schemas"
+		// 注意，这里只是设置了个路径，schemaMappings 里面应该还是个空，
+		// 但是idea调试的时候，执行完毕出去后，会发现schemaMappings里面有值了！！
+		// 原因在于 idea调试会调用这里的toString() 而toString方法里刚好调用了getSchemaMappings() 所以就到执行了load
 		this.schemaMappingsLocation = DEFAULT_SCHEMA_MAPPINGS_LOCATION;
 	}
 

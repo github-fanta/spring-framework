@@ -59,7 +59,12 @@ public class DelegatingEntityResolver implements EntityResolver {
 	 * (can be {@code null}) to use the default ClassLoader)
 	 */
 	public DelegatingEntityResolver(@Nullable ClassLoader classLoader) {
+		// 解析dtd的
 		this.dtdResolver = new BeansDtdResolver();
+		// 解析xsd的
+		// 注意，这里只是设置了个路径，schemaMappings 里面应该还是个空，
+		// 但是idea调试的时候，执行完毕出来后，会发现schemaMappings里面有值了！！
+		// 原因在于 idea调试会调用这里的toString() 而toString方法里刚好调用了getSchemaMappings() 所以就到执行了load
 		this.schemaResolver = new PluggableSchemaResolver(classLoader);
 	}
 

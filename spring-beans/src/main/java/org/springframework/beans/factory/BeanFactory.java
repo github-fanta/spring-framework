@@ -153,6 +153,7 @@ public interface BeanFactory {
 	 * @throws BeanNotOfRequiredTypeException if the bean is not of the required type
 	 * @throws BeansException if the bean could not be created
 	 */
+	// to AbstractBeanFactory
 	<T> T getBean(String name, Class<T> requiredType) throws BeansException;
 
 	/**
